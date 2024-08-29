@@ -10,11 +10,11 @@ This repo contains code for reproducing the piecewise linear (PWL) bounds introd
 
 1. Clone the repository: 
    
-   ```bash git clone https://github.com/benbatten/GeometricVerificationPWL.git``` 
+   ```bash git clone https://github.com/benbatten/PWL-Geometric-Verification.git``` 
 
 2. Navigate to the project directory: 
    
-   ```cd GeometricVerificationPWL```
+   ```cd PWL-Geometric-Verification```
 
 3. Install dependencies : 
    
