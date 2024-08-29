@@ -1,0 +1,7 @@
+gurobipy==11.0.0
+matplotlib==3.8.2
+numpy==2.1.0
+scipy==1.14.1
+torch==2.1.2
+torchvision==0.16.2
+tqdm==4.66.1
