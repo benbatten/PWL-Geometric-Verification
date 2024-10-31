@@ -16,7 +16,7 @@ import pickle
 
 from utils import gurobi_lin
 import utils
-import visualize
+# import visualize
 # import test_suite
 from timeit import Timer as timer
 
@@ -28,7 +28,7 @@ parser.add_argument("--transformation", default=None, required=True, nargs='*', 
 parser.add_argument("--LB", default=None, required=True, nargs='*', type=float, help="List of the transformation lower bound(s).")
 parser.add_argument("--UB", default=None, required=True, nargs='*', type=float, help="List of the transformation upper bound(s).")
 parser.add_argument("--image_number", default=100, required=True, type=int, help="Number of images to obtain bounds for on MNIST")
-parser.add_argument("--save_bounds", required=True, help="Indicates whether or not to save the bounds.")
+parser.add_argument("--save_bounds", required=True, action='store_true', help="Indicates whether or not to save the bounds.")
 parser.add_argument("--bound_type", required=True, help="Indicates whether we are using 'linear' or 'pw_linear' bounds.")
 parser.add_argument("--dset", required=True, help="The dataset used, MNIST or CIFAR.")
 
@@ -619,7 +619,6 @@ def main(im_num, with_vis=False):
         im = Image(torch.tensor(fashion_dataset.data[im_num, :, :]/255., dtype=torch.float64), args.transformation, args.LB, args.UB)
     im.sample(args.sample_num, args.LB, args.UB)
 
-    import test_suite
     # start = time.time()
     # unsafe_lin_lb = test_suite.custom_lin_solver(im.image_samples, im.parameter_samples, 'lower', num_iterations=1000, lr=0.01)
     # unsafe_lin_ub = test_suite.custom_lin_solver(im.image_samples, im.parameter_samples, 'upper', num_iterations=10000, lr=0.5)
