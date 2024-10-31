@@ -6,41 +6,25 @@ import numpy as np
 import torch
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-# import matplotlib as mpl
-# mpl.use('Qt5Agg')
 
-# rotation_matrix_generator = lambda angle: torch.tensor([[torch.cos(angle), torch.sin(angle)],
-                                          # [-torch.sin(angle), torch.cos(angle)]], dtype=torch.float64)
 
 def rotation_matrix_generator(angle_tensor):
-    # to_return = torch.empty((2, 2, len(angle_tensor)))#Takes 1D tensor of size (batch,).
     return torch.stack((torch.stack((torch.cos(angle_tensor), torch.sin(angle_tensor)), dim=1), torch.stack((-torch.sin(angle_tensor), torch.cos(angle_tensor)), dim=1)), dim=2)
-    # return torch.stack((torch.cos(angle_tensor), torch.sin(angle_tensor), -torch.sin(angle_tensor), torch.cos(angle_tensor)), dim=0).view(len(angle_tensor), 2, 2)
 
 
 def scale_matrix_generator(scale_tensor):
     return torch.stack((torch.stack((1/scale_tensor, 0*scale_tensor), dim=1),
                  torch.stack((0 * scale_tensor, 1/scale_tensor), dim=1)), dim=2)
-    # return torch.stack((1/scale_tensor, 0*scale_tensor, 0*scale_tensor, 1/scale_tensor), dim=0).view(len(scale_tensor), 2, 2)
 
 
 def shear_matrix_generator(shear_tensor):
     return torch.stack((torch.stack(((0*shear_tensor)+1, -shear_tensor), dim=1), torch.stack((0*shear_tensor, (0*shear_tensor)+1), dim=1)), dim=2)
-    # return torch.stack((0*shear_tensor, -shear_tensor, 0*shear_tensor, (0*shear_tensor)+1), dim=0).view(len(shear_tensor), 2, 2)
-
-# scale_matrix_generator = lambda scale: torch.tensor([[1 / scale, 0],
-#                                        [0, 1 / scale]], dtype=torch.float64)
-# shear_matrix_generator = lambda shear: torch.tensor([[1, -shear],
-#                                        [0, 1]], dtype=torch.float64)
 
 
 matrix_generators = {
     'rotate' : rotation_matrix_generator,
     'scale' : scale_matrix_generator,
     'shear' : shear_matrix_generator
-    # 'rotate_scale' : rotation_scale_generator,
-    # 'scale_shear' : scale_shear_generator,
-    # 'rotation_scale_shear' : rotation_scale_shear_generator
 }
 
 invert_rot_param = lambda angle: -angle
@@ -61,11 +45,6 @@ def max_rotate_grad_parallel(active_intervals, xy_grid):
     '''
     active_intervals = active_intervals[..., 0]
     x, y = xy_grid
-    # static_points = torch.stack((
-    #     torch.arctan(xy_grid[0, ...] / xy_grid[1, ...]), torch.arctan(-xy_grid[1, ...] / xy_grid[0, ...])))
-    # static_bool = (active_intervals[:, None, None, None, 0] < static_points[None, ...]) & (static_points[None, ...] < active_intervals[:, None, None, None, 1])
-    # candidate_grads = torch.stack((
-    #     -xy_grid[0, ...] * torch.sin(candidate_params) - xy_grid[1, ...] * torch.cos(candidate_params), xy_grid[0, ...] * torch.cos(candidate_params) - xy_grid[1, ...] * torch.sin(candidate_params)), dim=1)# Should be the same shape as candidate params with an extra dim size 2
     static_points = torch.stack((
         torch.arctan(x / y), torch.arctan(-y / x))).to(active_intervals.device)
     static_bool = (active_intervals[:, :1] < static_points[None, ...]) & (static_points[None, ...] < active_intervals[:, 1:])
@@ -185,14 +164,6 @@ def max_rotate_shear_grad_parallel(active_intervals, xy_grid):
                grad(active_intervals[:, 1, 1], active_intervals[:, 0, 1])[None, :], grad(active_intervals[:, 1, 1], active_intervals[:, 1, 1])[None, :],
                grad(torch.zeros_like(active_intervals[:, 0, 0], device=active_intervals.device), active_intervals[:, 0, 1])[None, :], grad(torch.zeros_like(active_intervals[:, 0, 0], device=active_intervals.device), active_intervals[:, 1, 1])[None, :]))
 
-    # grad(active_intervals[:, 0, 1], active_intervals[:, 0, 1])[None, :]
-    # grad(active_intervals[:, 0, 1], active_intervals[:, 1, 1])[None, :]
-    #
-    # grad(active_intervals[:, 1, 1], active_intervals[:, 0, 1])[None, :]
-    # grad(active_intervals[:, 1, 1], active_intervals[:, 1, 1])[None, :]
-    #
-    # grad(torch.zeros_like(active_intervals[:, 0, 0]), active_intervals[:, 0, 1])[None, :]
-    # grad(torch.zeros_like(active_intervals[:, 0, 0]), active_intervals[:, 1, 1])[None, :]
 
     drotx_dtheta_max = torch.max(abs(candidates), dim=0).values
 
@@ -405,8 +376,6 @@ def sample_from_edges(parameter_bounds, num_samples=10):
 
     if len(lower_bounds) == 1:  # 1D case
         # The edges are simply the two endpoints
-        # parameter_samples = torch.linspace(0, 1, sample_number)
-        # parameter_samples = lb + (ub - lb) * parameter_samples[:, None]
         samps = torch.linspace(lower_bounds[0], upper_bounds[0], int(num_samples/2))
         return torch.tensor(np.concatenate((samps, torch.flip(samps, dims=(0,)))), dtype=torch.float64).unsqueeze(1)
 
