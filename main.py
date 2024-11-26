@@ -2,21 +2,20 @@
 __author__ = "Ben Batten"
 __email__ = "b.batten@imperial.ac.uk"
 """
-
 import argparse
+import logging
+import pickle
+import time
+
 import numpy as np
 import torch
 import torch.multiprocessing as mp
 import torchvision.datasets as datasets
 from matplotlib import pyplot as plt
-import scipy
-import logging
-import time
-import pickle
 
-from utils import gurobi_lin
 import utils
-from timeit import Timer as timer
+import visualize
+from utils import gurobi_lin
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -35,6 +34,7 @@ parser.add_argument("--split_num", default=3, required=False, type=int, help="Sp
 
 
 parser.add_argument("--use_gpu", action='store_true', help="Sets the default device for Tensor computation.")
+parser.add_argument("--viz", action='store_true', help="Visualize results or not.")
 parser.add_argument("--sample_num", default=100, required=False, type=int, help="Number of samples used in the empirical approximation of the pixel value curve.")
 parser.add_argument("--lipschitz_error", default=0.05, required=False, type=float, help="Final error allowed in lipschitz BaB.")
 
@@ -531,11 +531,11 @@ if __name__ == '__main__':
         if args.bound_type == 'linear':
             with torch.no_grad():
                 # make sure automatic torch gradients are not unnecessarily computed
-                bounds = main(im, with_vis=False)
+                bounds = main(im, with_vis=args.viz)
         elif args.bound_type == 'pw_linear':
             with torch.no_grad():
                 # make sure automatic torch gradients are not unnecessarily computed
-                bounds = main(im, with_vis=False)
+                bounds = main(im, with_vis=args.viz)
                 # pass
         if args.save_bounds:
             lbs = '-'.join(list(map(str,original_lb.tolist())))
