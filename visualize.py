@@ -2,10 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def visualize_pw_bounds(i, j, parameter_samples, image_samples, safe_lin_lb, safe_lin_ub, safe_pw_bounds, pw_indicator):
-    height = image_samples.shape[1]
-    width = image_samples.shape[2]
-
-    fig = plt.figure()
+    plt.figure()
 
     # Image ---------------------------------------------------
     plt.subplot(1, 2, 1)
